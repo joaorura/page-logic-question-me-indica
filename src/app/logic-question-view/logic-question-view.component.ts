@@ -54,7 +54,6 @@ export class LogicQuestionViewComponent implements OnInit {
     const div = document.getElementsByClassName('theQuestion')[0];
     div.innerHTML = '';
     let j = 0;
-
     theQuestion.text.split('\n').forEach((questionText: string) => {
 
       if (questionText === '') {
@@ -64,8 +63,21 @@ export class LogicQuestionViewComponent implements OnInit {
         div.innerHTML += `<img src="${theQuestion.imgs[j]}" class="imgQuestion" alt="Imagem da Questão">`;
         j++;
       }
+      else if (questionText.includes('{img}')){
+        let allText = '';
+        questionText.split('{img}').forEach((text: string) => {
+          if (text === '') {
+            allText += `<img src="${theQuestion.imgs[j]}" class="imgQuestion" alt="Imagem da Questão">`;
+            j++;
+          }
+          else {
+            allText += text;
+          }
+        });
+        div.innerHTML += `<p>${allText}</p>`;
+      }
       else {
-        div.innerHTML += `<p class="textQuestion">${questionText}</p>`;
+        div.innerHTML += `<p>${questionText}</p>`;
       }
     });
 
