@@ -1,9 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LogicQuestionsModel} from './logic-questions.model';
 import {LogicQuestionService} from './logic-question.service';
-import {HttpClient} from '@angular/common/http';
 
-import {httpHeaders, logicQuestionApiUrlBase} from './logic-questions.api.config';
 
 @Component({
   selector: 'app-logic-question-view',
@@ -13,49 +11,70 @@ import {httpHeaders, logicQuestionApiUrlBase} from './logic-questions.api.config
 })
 export class LogicQuestionViewComponent implements OnInit {
   private questions: LogicQuestionsModel[];
-  actualElement = 0;
   private answers: number[] = [];
-  private accepts: number[] = [];
+  private note = 0;
 
-  public alternatives: string[] = null;
+  private actualElement = 0;
 
-  constructor(private logicQuestionService: LogicQuestionService,
-              private http: HttpClient) {
+  formControl = false;
+
+  constructor(private logicQuestionService: LogicQuestionService) {
     for (let i = 0;  i < 14; i++) { this.answers[i] = null; }
-    for (let i = 0; i < 7; i++) { this.accepts[i] = 0; }
   }
 
   ngOnInit(): void {
     this.loadQuestions();
   }
 
-  private setQuestions() {
-    return (theQuestions: LogicQuestionsModel[]) => {
-      this.questions = theQuestions;
-    };
+  private setFormControl(formAux: boolean): void {
+    this.formControl = formAux;
   }
 
-  private setBoxIfExist(index: number) {
-    const value = this.answers[index];
-    if (value !== null) {
-      const name = this.questions[index].alternatives[value] + index + value;
-      const options = document.getElementById(name);
-      if (options !== null) {
-        options.setAttribute('checked', '1');
-      }
-      else {
-        window.setTimeout(() => this.setBoxIfExist(index), 10);
+  private setQuestions(theQuestions: LogicQuestionsModel[]) {
+    this.questions = theQuestions;
+  }
+  private attRadios(alternatives: string[]) {
+    try {
+      for (let i = 0; i < 5; i++) {
+        const theElement = document.getElementById('optionQuestion' + i) as HTMLInputElement;
+        const theDiv = document.getElementById('divOptionQuestion' + i);
+        const label = document.getElementById('labelOptionQuestion' + i);
+
+        if (alternatives[i] === undefined) {
+          theDiv.setAttribute('class', 'form-check optionNotUsed');
+          continue;
+        }
+
+        theDiv.setAttribute('class', 'form-check');
+        let allText = '';
+        if (alternatives[i].includes('{img}')) {
+          alternatives[i].split('{img}').forEach((text: string) => {
+            if (text.includes('http')) {
+              allText += `<img src="${text}" alt="Foto da Alternativas">`;
+            } else {
+              allText += text;
+            }
+          });
+
+          label.textContent = allText;
+        } else {
+          label.textContent = alternatives[i];
+        }
+
+        theElement.checked = this.answers[this.actualElement] === i;
       }
     }
+    catch (e) {
+      window.setTimeout(() => this.attRadios(alternatives), 1);
+    }
   }
-
   private attComponent() {
     const theQuestion: LogicQuestionsModel = this.questions[this.actualElement];
     const div = document.getElementsByClassName('theQuestion')[0];
     div.innerHTML = '';
     let j = 0;
-    theQuestion.text.split('\n').forEach((questionText: string) => {
 
+    theQuestion.text.split('\n').forEach((questionText: string) => {
       if (questionText === '') {
         div.innerHTML += '<br>';
       }
@@ -65,8 +84,9 @@ export class LogicQuestionViewComponent implements OnInit {
       }
       else if (questionText.includes('{img}')){
         let allText = '';
-        questionText.split('{img}').forEach((text: string) => {
-          if (text === '') {
+
+        questionText.replace('{img}', '|||{img}|||').split('|||').forEach((text: string) => {
+          if (text === '{img}') {
             allText += `<img src="${theQuestion.imgs[j]}" class="imgQuestion" alt="Imagem da Questão">`;
             j++;
           }
@@ -81,22 +101,16 @@ export class LogicQuestionViewComponent implements OnInit {
       }
     });
 
-    this.alternatives = theQuestion.alternatives;
-    this.setBoxIfExist(this.actualElement);
-  }
-
-  private attComponentFunc() {
-    return () => {
-      this.attComponent();
-    };
+    this.attRadios(theQuestion.alternatives);
   }
 
   private loadQuestions() {
-    const setQuestion = this.setQuestions();
-    const attComponent = this.attComponentFunc();
-
+    const setQuestion = (a) => this.setQuestions(a);
+    const attComponent = () => this.attComponent();
+    const formControl = (a) => this.setFormControl(a);
     this.logicQuestionService.getQuestions().subscribe({
       next(input: LogicQuestionsModel[]) {
+        formControl(true);
         setQuestion(input);
         attComponent();
       },
@@ -109,13 +123,21 @@ export class LogicQuestionViewComponent implements OnInit {
 
   private submitForm(): void {
     for (let i = 0; i < 14; i++) {
-      const j = Math.floor(i / 2);
-      this.accepts[j] += this.answers[i] === this.questions[i].answer ? 1 : 0;
+      if (this.answers[i] === this.questions[i].answer) {
+        this.note +=  this.questions[i].level;
+      }
     }
     console.log('send');
 
-    this.http.post(logicQuestionApiUrlBase, { accepts: this.accepts },
-      { headers: httpHeaders });
+    this.logicQuestionService.sendNote(this.note).subscribe({
+      complete() {},
+      error(error: Error) {
+        console.log(error);
+      },
+      next(answer: any) {
+        console.log(answer);
+      }
+    });
   }
 
   private changeActualElement(amount: number): void {

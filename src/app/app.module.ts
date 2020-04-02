@@ -12,7 +12,7 @@ import { LogicQuestionViewComponent } from './logic-question-view/logic-question
   ],
   imports: [
     BrowserModule,
-    HttpClientModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

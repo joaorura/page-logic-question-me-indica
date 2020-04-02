@@ -12,13 +12,13 @@ export class LogicQuestionService {
   constructor(private http: HttpClient) {
   }
 
-  // tslint:disable-next-line:ban-types
   getQuestions(): Observable<LogicQuestionsModel[]> {
-    // return new Observable<LogicQuestionsModel[]>((subscriber: Subscriber<LogicQuestionsModel[]>) => {
-    //   subscriber.next(logicQuestions);
-    //   subscriber.complete();
-    // });
-    return this.http.post<LogicQuestionsModel[]>(logicQuestionApiUrlBase, {}, { headers: httpHeaders });
+    return this.http.post<LogicQuestionsModel[]>(logicQuestionApiUrlBase, {},
+      { headers: httpHeaders });
   }
 
+  sendNote(theNote: number): Observable<any> {
+    return this.http.post(logicQuestionApiUrlBase, { note: theNote },
+      { headers: httpHeaders });
+  }
 }

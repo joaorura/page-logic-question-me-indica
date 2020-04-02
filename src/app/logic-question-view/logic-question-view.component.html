@@ -1,18 +1,75 @@
 <div class="theQuestion">
 </div>
 
-<form *ngIf="alternatives !== null">
+<form
+  *ngIf="formControl">
   <div class="form-group">
-    <div class="form-check" *ngFor="let alternative of alternatives; let i = index" [attr.data-index]="i">
+    <div class="form-check"
+      id="divOptionQuestion0">
       <input class="form-check-input"
              type="radio"
-             [value]="i"
+             value="0"
              name="optionsQuestion"
-             id="{{'' + alternative + actualElement + i}}"
-             >
+             id="optionQuestion0">
       <label class="form-check-label"
-             for="{{'' + alternative + actualElement + i}}">
-        {{alternative}}
+             for="optionQuestion0"
+             id="labelOptionQuestion0">
+      </label>
+    </div>
+
+    <div class="form-check"
+         id="divOptionQuestion1">
+      <input class="form-check-input"
+             type="radio"
+             value="1"
+             name="optionsQuestion"
+             id="optionQuestion1"
+      >
+      <label class="form-check-label"
+             for="optionQuestion1"
+             id="labelOptionQuestion1">
+      </label>
+    </div>
+
+    <div class="form-check"
+         id="divOptionQuestion2">
+      <input class="form-check-input"
+             type="radio"
+             value="2"
+             name="optionsQuestion"
+             id="optionQuestion2">
+      <label class="form-check-label"
+             for="optionQuestion2"
+             id="labelOptionQuestion2">
+
+      </label>
+    </div>
+
+    <div class="form-check"
+         id="divOptionQuestion3">
+      <input class="form-check-input"
+             type="radio"
+             value="3"
+             name="optionsQuestion"
+             id="optionQuestion3">
+      <label class="form-check-label"
+             for="optionQuestion3"
+             id="labelOptionQuestion3">
+      </label>
+    </div>
+
+
+    <div class="form-check"
+         id="divOptionQuestion4">
+      <input class="form-check-input"
+             type="radio"
+             value="4"
+             name="optionsQuestion"
+             id="optionQuestion4"
+      >
+      <label class="form-check-label"
+             for="optionQuestion4"
+             id="labelOptionQuestion4">
       </label>
     </div>
   </div>
