@@ -48,6 +48,7 @@ export class LogicQuestionViewComponent implements OnInit {
         theDiv.setAttribute('class', 'form-check');
         let allText = '';
         if (alternatives[i].includes('{img}')) {
+          console.log(alternatives[i].split('{img}'));
           alternatives[i].split('{img}').forEach((text: string) => {
             if (text.includes('http')) {
               allText += `<img src="${text}" alt="Foto da Alternativas">`;
@@ -56,9 +57,9 @@ export class LogicQuestionViewComponent implements OnInit {
             }
           });
 
-          label.textContent = allText;
+          label.innerHTML = allText;
         } else {
-          label.textContent = alternatives[i];
+          label.innerHTML = alternatives[i];
         }
 
         theElement.checked = this.answers[this.actualElement] === i;
@@ -84,9 +85,9 @@ export class LogicQuestionViewComponent implements OnInit {
       }
       else if (questionText.includes('{img}')){
         let allText = '';
-
-        questionText.replace('{img}', '|||{img}|||').split('|||').forEach((text: string) => {
-          if (text === '{img}') {
+        console.log(questionText.split('{img}'));
+        questionText.split('{img}').forEach((text: string) => {
+          if (text === '') {
             allText += `<img src="${theQuestion.imgs[j]}" class="imgQuestion" alt="Imagem da Questão">`;
             j++;
           }
